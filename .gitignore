@@ -7,7 +7,6 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
 
 # Native
 .kotlin/
@@ -35,3 +34,25 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Firebase
+firebase-service-account-key.json
+*.json
+
+# Java
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Environment
+.env
+application-local.properties
+
+# Logs
+*.log
