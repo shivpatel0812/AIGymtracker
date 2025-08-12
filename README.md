@@ -2,6 +2,20 @@
 
 A comprehensive fitness tracking application with React Native frontend, Spring Boot API, Python AI backend, and Firebase integration.
 
+## 📋 Summary
+
+GymApp is your AI-powered fitness companion that transforms your daily health data into actionable insights. By tracking your **macros** (calories, protein, carbs, fat), **workouts** (exercises, sets, reps, weights), **sleep quality**, **hydration levels**, and **stress factors**, the app creates a complete picture of your fitness journey.
+
+The AI backend analyzes this comprehensive dataset to:
+
+- **Identify patterns** between nutrition, sleep, and workout performance
+- **Recommend optimal workout timing** based on your sleep and stress data
+- **Suggest macro adjustments** to fuel your specific workout goals
+- **Track progress trends** and predict plateaus before they happen
+- **Provide personalized insights** for continuous improvement
+
+Whether you're bulking, cutting, or maintaining, GymApp helps you make data-driven decisions to reach your fitness goals faster and more efficiently.
+
 ## 🏗️ Architecture
 
 - **Frontend**: React Native with Expo
