@@ -16,6 +16,9 @@ export const ENV = {
   APP_NAME: "GymApp",
   APP_VERSION: "1.0.0",
 
+  // API Configuration
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:8080",
+  
   // Feature Flags
   ENABLE_ANONYMOUS_AUTH: true,
   ENABLE_OFFLINE_CACHE: true,
@@ -29,4 +32,5 @@ console.log("Environment variables loaded:", {
   FIREBASE_STORAGE_BUCKET: ENV.FIREBASE_STORAGE_BUCKET,
   FIREBASE_MESSAGING_SENDER_ID: ENV.FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID: ENV.FIREBASE_APP_ID,
+  API_BASE_URL: ENV.API_BASE_URL,
 });

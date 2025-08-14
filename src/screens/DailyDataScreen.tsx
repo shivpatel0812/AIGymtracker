@@ -28,16 +28,18 @@ interface FoodItem {
 }
 
 export const DailyDataScreen: React.FC = () => {
-  const [hydrationData, setHydrationData] = useState<HydrationEntry | null>(null);
+  const [hydrationData, setHydrationData] = useState<HydrationEntry | null>(
+    null
+  );
   const [stressData, setStressData] = useState<StressEntry | null>(null);
   const [macroData, setMacroData] = useState<MacroEntry | null>(null);
-  
+
   const [waterIntake, setWaterIntake] = useState("");
   const [hydrationQuality, setHydrationQuality] = useState(5);
   const [stressLevel, setStressLevel] = useState(5);
   const [stressFactors, setStressFactors] = useState("");
   const [foods, setFoods] = useState<FoodItem[]>([]);
-  
+
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,10 +47,11 @@ export const DailyDataScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const params = route.params as any;
-  const selectedDate = params?.date || new Date().toISOString().split('T')[0];
+  const selectedDate = params?.date || new Date().toISOString().split("T")[0];
 
   const cupsToLiters = (cups: number) => cups * 0.236588;
-  const litersToCups = (liters: number) => Math.round(liters / 0.236588 * 100) / 100;
+  const litersToCups = (liters: number) =>
+    Math.round((liters / 0.236588) * 100) / 100;
 
   useEffect(() => {
     loadDayData();
@@ -59,7 +62,7 @@ export const DailyDataScreen: React.FC = () => {
       const [hydration, stress, macros] = await Promise.all([
         getTodayHydration(selectedDate),
         getTodayStress(selectedDate),
-        getTodayMacros(selectedDate)
+        getTodayMacros(selectedDate),
       ]);
 
       setHydrationData(hydration);
@@ -136,7 +139,7 @@ export const DailyDataScreen: React.FC = () => {
   };
 
   const saveMacros = async () => {
-    const validFoods = foods.filter(food => food.name.trim() !== "");
+    const validFoods = foods.filter((food) => food.name.trim() !== "");
     if (validFoods.length === 0) {
       Alert.alert("Error", "Please add at least one food item");
       return;
@@ -161,34 +164,46 @@ export const DailyDataScreen: React.FC = () => {
   };
 
   const addFoodItem = () => {
-    setFoods([...foods, { name: "", calories: 0, protein: 0, carbs: 0, fat: 0 }]);
+    setFoods([
+      ...foods,
+      { name: "", calories: 0, protein: 0, carbs: 0, fat: 0 },
+    ]);
   };
 
   const removeFoodItem = (index: number) => {
     setFoods(foods.filter((_, i) => i !== index));
   };
 
-  const updateFoodItem = (index: number, field: keyof FoodItem, value: string | number) => {
+  const updateFoodItem = (
+    index: number,
+    field: keyof FoodItem,
+    value: string | number
+  ) => {
     const updatedFoods = [...foods];
-    if (typeof value === 'string' && field !== 'name') {
-      updatedFoods[index][field] = parseFloat(value) || 0;
-    } else {
-      updatedFoods[index][field] = value as any;
+    if (typeof value === "string" && field !== "name") {
+      (updatedFoods[index] as any)[field] = parseFloat(value) || 0;
+    } else if (field === "name" && typeof value === "string") {
+      updatedFoods[index].name = value;
+    } else if (typeof value === "number") {
+      (updatedFoods[index] as any)[field] = value;
     }
     setFoods(updatedFoods);
   };
 
   const calculateTotals = () => {
-    return foods.reduce((totals, food) => ({
-      calories: totals.calories + food.calories,
-      protein: totals.protein + food.protein,
-      carbs: totals.carbs + food.carbs,
-      fat: totals.fat + food.fat,
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    return foods.reduce(
+      (totals, food) => ({
+        calories: totals.calories + food.calories,
+        protein: totals.protein + food.protein,
+        carbs: totals.carbs + food.carbs,
+        fat: totals.fat + food.fat,
+      }),
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
   };
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + 'T00:00:00');
+    const date = new Date(dateStr + "T00:00:00");
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       month: "short",
@@ -201,7 +216,9 @@ export const DailyDataScreen: React.FC = () => {
   const qualityOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <Text variant="headlineSmall" style={styles.dateTitle}>
         {formatDate(selectedDate)}
       </Text>
@@ -236,11 +253,15 @@ export const DailyDataScreen: React.FC = () => {
                 style={styles.input}
               />
               <Text variant="bodySmall" style={styles.conversionText}>
-                {waterIntake && !isNaN(parseFloat(waterIntake)) ? 
-                  `≈ ${cupsToLiters(parseFloat(waterIntake)).toFixed(2)} liters` : 
-                  "1 cup = 0.24 liters"}
+                {waterIntake && !isNaN(parseFloat(waterIntake))
+                  ? `≈ ${cupsToLiters(parseFloat(waterIntake)).toFixed(
+                      2
+                    )} liters`
+                  : "1 cup = 0.24 liters"}
               </Text>
-              <Text variant="titleSmall" style={styles.label}>Quality (1-10)</Text>
+              <Text variant="titleSmall" style={styles.label}>
+                Quality (1-10)
+              </Text>
               <View style={styles.chipContainer}>
                 {qualityOptions.map((quality) => (
                   <Chip
@@ -249,9 +270,15 @@ export const DailyDataScreen: React.FC = () => {
                     onPress={() => setHydrationQuality(quality)}
                     style={[
                       styles.chip,
-                      hydrationQuality === quality && { backgroundColor: colors.neonCyan }
+                      hydrationQuality === quality && {
+                        backgroundColor: colors.neonCyan,
+                      },
                     ]}
-                    textStyle={hydrationQuality === quality && { color: theme.colors.surface }}
+                    textStyle={
+                      hydrationQuality === quality && {
+                        color: theme.colors.surface,
+                      }
+                    }
                   >
                     {quality}
                   </Chip>
@@ -262,7 +289,8 @@ export const DailyDataScreen: React.FC = () => {
             <View>
               {hydrationData ? (
                 <Text variant="bodyMedium">
-                  {litersToCups(hydrationData.water_intake)} cups • Quality: {hydrationData.hydration_quality}/10
+                  {litersToCups(hydrationData.water_intake)} cups • Quality:{" "}
+                  {hydrationData.hydration_quality}/10
                 </Text>
               ) : (
                 <Text variant="bodyMedium" style={{ opacity: 0.6 }}>
@@ -294,7 +322,9 @@ export const DailyDataScreen: React.FC = () => {
 
           {editingSection === "stress" ? (
             <View>
-              <Text variant="titleSmall" style={styles.label}>Stress Level (1-10)</Text>
+              <Text variant="titleSmall" style={styles.label}>
+                Stress Level (1-10)
+              </Text>
               <View style={styles.chipContainer}>
                 {qualityOptions.map((level) => (
                   <Chip
@@ -303,9 +333,13 @@ export const DailyDataScreen: React.FC = () => {
                     onPress={() => setStressLevel(level)}
                     style={[
                       styles.chip,
-                      stressLevel === level && { backgroundColor: colors.neonCyan }
+                      stressLevel === level && {
+                        backgroundColor: colors.neonCyan,
+                      },
                     ]}
-                    textStyle={stressLevel === level && { color: theme.colors.surface }}
+                    textStyle={
+                      stressLevel === level && { color: theme.colors.surface }
+                    }
                   >
                     {level}
                   </Chip>
@@ -370,25 +404,37 @@ export const DailyDataScreen: React.FC = () => {
               <View style={styles.totalsGrid}>
                 <View style={styles.totalItem}>
                   <Text variant="titleSmall">Calories</Text>
-                  <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                  <Text
+                    variant="headlineSmall"
+                    style={{ color: colors.neonCyan }}
+                  >
                     {totals.calories}
                   </Text>
                 </View>
                 <View style={styles.totalItem}>
                   <Text variant="titleSmall">Protein</Text>
-                  <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                  <Text
+                    variant="headlineSmall"
+                    style={{ color: colors.neonCyan }}
+                  >
                     {totals.protein}g
                   </Text>
                 </View>
                 <View style={styles.totalItem}>
                   <Text variant="titleSmall">Carbs</Text>
-                  <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                  <Text
+                    variant="headlineSmall"
+                    style={{ color: colors.neonCyan }}
+                  >
                     {totals.carbs}g
                   </Text>
                 </View>
                 <View style={styles.totalItem}>
                   <Text variant="titleSmall">Fat</Text>
-                  <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                  <Text
+                    variant="headlineSmall"
+                    style={{ color: colors.neonCyan }}
+                  >
                     {totals.fat}g
                   </Text>
                 </View>
@@ -419,7 +465,9 @@ export const DailyDataScreen: React.FC = () => {
                       mode="outlined"
                       label="Food Name"
                       value={food.name}
-                      onChangeText={(value) => updateFoodItem(index, 'name', value)}
+                      onChangeText={(value) =>
+                        updateFoodItem(index, "name", value)
+                      }
                       style={styles.input}
                     />
 
@@ -428,7 +476,9 @@ export const DailyDataScreen: React.FC = () => {
                         mode="outlined"
                         label="Calories"
                         value={food.calories.toString()}
-                        onChangeText={(value) => updateFoodItem(index, 'calories', value)}
+                        onChangeText={(value) =>
+                          updateFoodItem(index, "calories", value)
+                        }
                         keyboardType="numeric"
                         style={styles.macroInput}
                       />
@@ -436,7 +486,9 @@ export const DailyDataScreen: React.FC = () => {
                         mode="outlined"
                         label="Protein (g)"
                         value={food.protein.toString()}
-                        onChangeText={(value) => updateFoodItem(index, 'protein', value)}
+                        onChangeText={(value) =>
+                          updateFoodItem(index, "protein", value)
+                        }
                         keyboardType="numeric"
                         style={styles.macroInput}
                       />
@@ -444,7 +496,9 @@ export const DailyDataScreen: React.FC = () => {
                         mode="outlined"
                         label="Carbs (g)"
                         value={food.carbs.toString()}
-                        onChangeText={(value) => updateFoodItem(index, 'carbs', value)}
+                        onChangeText={(value) =>
+                          updateFoodItem(index, "carbs", value)
+                        }
                         keyboardType="numeric"
                         style={styles.macroInput}
                       />
@@ -452,7 +506,9 @@ export const DailyDataScreen: React.FC = () => {
                         mode="outlined"
                         label="Fat (g)"
                         value={food.fat.toString()}
-                        onChangeText={(value) => updateFoodItem(index, 'fat', value)}
+                        onChangeText={(value) =>
+                          updateFoodItem(index, "fat", value)
+                        }
                         keyboardType="numeric"
                         style={styles.macroInput}
                       />
@@ -468,30 +524,49 @@ export const DailyDataScreen: React.FC = () => {
                   <View style={styles.totalsGrid}>
                     <View style={styles.totalItem}>
                       <Text variant="titleSmall">Calories</Text>
-                      <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
-                        {macroData.foods.reduce((sum, f) => sum + f.calories, 0)}
+                      <Text
+                        variant="headlineSmall"
+                        style={{ color: colors.neonCyan }}
+                      >
+                        {macroData.foods.reduce(
+                          (sum, f) => sum + f.calories,
+                          0
+                        )}
                       </Text>
                     </View>
                     <View style={styles.totalItem}>
                       <Text variant="titleSmall">Protein</Text>
-                      <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
-                        {macroData.foods.reduce((sum, f) => sum + f.protein, 0)}g
+                      <Text
+                        variant="headlineSmall"
+                        style={{ color: colors.neonCyan }}
+                      >
+                        {macroData.foods.reduce((sum, f) => sum + f.protein, 0)}
+                        g
                       </Text>
                     </View>
                     <View style={styles.totalItem}>
                       <Text variant="titleSmall">Carbs</Text>
-                      <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                      <Text
+                        variant="headlineSmall"
+                        style={{ color: colors.neonCyan }}
+                      >
                         {macroData.foods.reduce((sum, f) => sum + f.carbs, 0)}g
                       </Text>
                     </View>
                     <View style={styles.totalItem}>
                       <Text variant="titleSmall">Fat</Text>
-                      <Text variant="headlineSmall" style={{ color: colors.neonCyan }}>
+                      <Text
+                        variant="headlineSmall"
+                        style={{ color: colors.neonCyan }}
+                      >
                         {macroData.foods.reduce((sum, f) => sum + f.fat, 0)}g
                       </Text>
                     </View>
                   </View>
-                  <Text variant="bodySmall" style={{ marginTop: 8, opacity: 0.7 }}>
+                  <Text
+                    variant="bodySmall"
+                    style={{ marginTop: 8, opacity: 0.7 }}
+                  >
                     {macroData.foods.length} food items logged
                   </Text>
                 </View>

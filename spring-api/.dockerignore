@@ -1,0 +1,60 @@
+# Maven
+target/
+!target/analysis-api-*.jar
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# IDE
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+.settings/
+.project
+.classpath
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Testing
+.coverage
+test-output/
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Scripts (development only)
+*.sh
+!mvnw
+
+# Firebase (will be mounted as volume)
+# Keep this comment as reminder

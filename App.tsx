@@ -24,6 +24,7 @@ import { HydrationScreen } from "./src/screens/HydrationScreen";
 import { StressScreen } from "./src/screens/StressScreen";
 import { DailyDataScreen } from "./src/screens/DailyDataScreen";
 import { AnalysisResultScreen } from "./src/screens/AnalysisResultScreen";
+import { AnalysisHistoryScreen } from "./src/screens/AnalysisHistoryScreen";
 
 const Stack = createStackNavigator();
 const PERSISTENCE_KEY = "NAVIGATION_STATE_V1";
@@ -284,6 +285,21 @@ const AppNavigator: React.FC = () => {
               component={AnalysisResultScreen}
               options={({ navigation }) => ({
                 title: "Analysis Results",
+                headerRight: () => (
+                  <IconButton
+                    icon="account"
+                    iconColor={paperTheme.colors.onSurface}
+                    onPress={() => navigation.navigate("Profile" as never)}
+                    size={24}
+                  />
+                ),
+              })}
+            />
+            <Stack.Screen
+              name="AnalysisHistory"
+              component={AnalysisHistoryScreen}
+              options={({ navigation }) => ({
+                title: "Analysis History",
                 headerRight: () => (
                   <IconButton
                     icon="account"

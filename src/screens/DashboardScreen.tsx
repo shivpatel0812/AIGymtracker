@@ -105,7 +105,8 @@ export const DashboardScreen: React.FC = () => {
       
       (navigation.navigate as any)('AnalysisResult', {
         analysisData: analysisResult,
-        analysisType: analysisType.charAt(0).toUpperCase() + analysisType.slice(1)
+        analysisType: analysisType.charAt(0).toUpperCase() + analysisType.slice(1),
+        dateRange: '30days'
       });
       
     } catch (error) {
@@ -115,7 +116,8 @@ export const DashboardScreen: React.FC = () => {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error occurred'
         },
-        analysisType: analysisType.charAt(0).toUpperCase() + analysisType.slice(1)
+        analysisType: analysisType.charAt(0).toUpperCase() + analysisType.slice(1),
+        dateRange: '30days'
       });
     } finally {
       setIsAnalyzing(false);
@@ -237,18 +239,29 @@ export const DashboardScreen: React.FC = () => {
         </Text>
         
         <View style={styles.analysisButtons}>
-          <Button
-            mode="contained"
-            onPress={() => handleAnalysis('comprehensive')}
-            disabled={isAnalyzing}
-            loading={isAnalyzing}
-            style={styles.analysisButton}
-            buttonColor={colors.neonCyan}
-            textColor={theme.colors.surface}
-            icon="chart-line"
-          >
-            Full Analysis
-          </Button>
+          <View style={styles.analysisButtonRow}>
+            <Button
+              mode="contained"
+              onPress={() => handleAnalysis('comprehensive')}
+              disabled={isAnalyzing}
+              loading={isAnalyzing}
+              style={[styles.analysisButton, styles.halfButton]}
+              buttonColor={colors.neonCyan}
+              textColor={theme.colors.surface}
+              icon="chart-line"
+            >
+              Full Analysis
+            </Button>
+            
+            <Button
+              mode="outlined"
+              onPress={() => navigation.navigate('AnalysisHistory' as never)}
+              style={[styles.analysisButton, styles.halfButton]}
+              icon="history"
+            >
+              View History
+            </Button>
+          </View>
           
           <View style={styles.analysisButtonRow}>
             <Button

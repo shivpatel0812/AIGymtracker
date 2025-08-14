@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  # Python Flask AI Analysis Service
+  ai-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gymapp-ai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      # Add your OpenAI API key here or via .env file
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      # Mount for development (optional - remove for production)
+      - ./backend:/app
+    networks:
+      - gymapp-network
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+    restart: unless-stopped
+
+  # SpringBoot API Gateway Service
+  spring-api:
+    build:
+      context: ./spring-api
+      dockerfile: Dockerfile
+    container_name: gymapp-spring-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - AI_PIPELINE_URL=http://ai-backend:8000
+      # Add Firebase credentials via environment or volume mount
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/firebase-service-account.json
+    volumes:
+      # Mount Firebase service account (make sure this file exists)
+      - ./spring-api/src/main/resources/gymapp-5cb9b-firebase-adminsdk-fbsvc-754b066dc1.json:/app/firebase-service-account.json:ro
+      # Mount for development (optional - remove for production)
+      - ./spring-api/src:/app/src
+    depends_on:
+      - ai-backend
+    networks:
+      - gymapp-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:8080/actuator/health || http://localhost:8080/api/analysis/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+networks:
+  gymapp-network:
+    driver: bridge
+
+volumes:
+  # Persistent volumes for data if needed
+  ai-data:
+  spring-data:

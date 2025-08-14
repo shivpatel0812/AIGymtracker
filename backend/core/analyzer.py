@@ -37,7 +37,7 @@ class WorkoutAnalyzer:
                         "content": prompt
                     }
                 ],
-                max_tokens=3000,
+                max_tokens=2000,
                 temperature=0.3
             )
             
@@ -132,16 +132,17 @@ class WorkoutAnalyzer:
                     'total_sets': len(sets)
                 })
         
+        summary += f"TOTAL EXERCISES TO ANALYZE: {len(exercise_data)} exercises\n\n"
+        
         for exercise, sessions in exercise_data.items():
-            if len(sessions) >= 2:
-                summary += f"\n{exercise}:\n"
-                for session in sessions[-3:]:
-                    set_details = []
-                    for s in session['sets']:
-                        set_details.append(f"Set {s.get('set', '?')}: {s.get('reps', '?')} reps")
-                    
-                    summary += f"  {session['date']} ({session['workout_type']}): {session['weight']}kg\n"
-                    summary += f"    {' | '.join(set_details)}\n"
+            summary += f"\n{exercise}:\n"
+            for session in sessions[-3:]:
+                set_details = []
+                for s in session['sets']:
+                    set_details.append(f"Set {s.get('set', '?')}: {s.get('reps', '?')} reps")
+                
+                summary += f"  {session['date']} ({session['workout_type']}): {session['weight']}kg\n"
+                summary += f"    {' | '.join(set_details)}\n"
         
         summary += f"\n📋 RECENT DETAILED WORKOUTS:\n"
         recent_workouts = workouts[-3:] if len(workouts) >= 3 else workouts
@@ -154,6 +155,53 @@ class WorkoutAnalyzer:
                     summary += f"    Set {s.get('set')}: {s.get('reps')} reps\n"
         
         return summary
+    
+    def _get_4_week_cycle_summary(self, workouts):
+        """Generate 4-week cycle analysis for progressive overload planning"""
+        if len(workouts) < 4:
+            return "📊 CYCLE STATUS: Insufficient data for 4-week cycle analysis\n\n"
+        
+        # Group workouts into weeks (assuming 2-3 workouts per week)
+        weeks = []
+        current_week = []
+        workouts_per_week = 3  # Estimate
+        
+        for i, workout in enumerate(workouts):
+            current_week.append(workout)
+            if len(current_week) >= workouts_per_week or i == len(workouts) - 1:
+                weeks.append(current_week)
+                current_week = []
+        
+        if len(weeks) < 2:
+            return "📊 CYCLE STATUS: Building data for cycle analysis\n\n"
+        
+        # Analyze current vs previous week
+        current_week = weeks[-1]
+        previous_week = weeks[-2] if len(weeks) > 1 else []
+        
+        summary = "📊 4-WEEK PROGRESSIVE OVERLOAD CYCLE:\n"
+        summary += f"Current Week: {len(current_week)} workouts | Previous Week: {len(previous_week)} workouts\n\n"
+        
+        # Calculate volume progression between weeks
+        if previous_week and current_week:
+            prev_volume = sum(self._calculate_workout_volume(w) for w in previous_week)
+            curr_volume = sum(self._calculate_workout_volume(w) for w in current_week)
+            
+            if prev_volume > 0:
+                volume_change = ((curr_volume - prev_volume) / prev_volume) * 100
+                summary += f"📈 Volume Change: {volume_change:+.1f}%\n"
+        
+        summary += "\n"
+        return summary
+    
+    def _calculate_workout_volume(self, workout):
+        """Calculate total workout volume (weight x reps)"""
+        total_volume = 0
+        for exercise in workout.get('exercises', []):
+            weight = exercise.get('weight', 0)
+            total_reps = sum(s.get('reps', 0) for s in exercise.get('sets', []))
+            total_volume += weight * total_reps
+        return total_volume
     
     def _get_detailed_progress(self):
         summary = "DETAILED SET-BY-SET PROGRESSION:\n\n"
@@ -216,41 +264,26 @@ class WorkoutAnalyzer:
             hydration_text = f"💧 HYDRATION CONTEXT:\n{hydration_context}\n\n"
         
         prompt = f"""
-{user_info}{focus_text}{nutrition_text}{sleep_text}{stress_text}{hydration_text}{data_summary}
+{user_info}{data_summary}
 
-As an expert fitness coach, analyze this detailed set-by-set workout data and provide:
+IMPORTANT: You must provide plans for ALL exercises listed above (see "TOTAL EXERCISES TO ANALYZE"). Do not skip any exercise.
 
-🔄 1. PROGRESSIVE OVERLOAD ANALYSIS:
-- How effectively are they progressing (weight and volume)?
-- Set-by-set performance patterns and fatigue analysis
-- Which exercises are advancing well vs stagnating?
-- Rate overall progression (1-10 scale)
+🎯 PLAN A - PURE PROGRESSIVE OVERLOAD (4 weeks):
+For EVERY SINGLE exercise in the data above, provide:
+- Week 1-2: Weight/rep/set targets with rest times
+- Week 3-4: Progressive increases
+- Focus on traditional progression (weight up, reps up, or volume up)
 
-📈 2. WORKOUT TYPE & PROGRAMMING ASSESSMENT:
-- Push/Pull/Legs balance and frequency
-- Recovery patterns between workout types
-- Volume distribution across muscle groups
-- Set and rep range effectiveness
+🔍 PLATEAU ANALYSIS:
+Check for stagnation patterns (same weight 3+ sessions, declining reps, etc.)
 
-🎯 3. SET-BY-SET PERFORMANCE INSIGHTS:
-- Fatigue patterns within exercises
-- Optimal set and rep schemes based on performance
-- Strength endurance vs pure strength focus
-- Rest time recommendations between sets
+⚡ PLAN B - STRATEGIC ALTERNATIVE (only if stagnation detected):
+ONLY suggest if you identify clear plateaus. For stuck exercises:
+- Exercise swap for different loading (e.g., incline press → flat press for heavier weight/lower reps)
+- Different rep ranges to break through
+- 4-week timeline with this strategic approach
 
-💡 4. PERSONALIZED RECOMMENDATIONS:
-- Programming adjustments (workout split, exercise order)
-- Progressive overload strategy (weight vs reps vs sets)
-- Exercise additions/modifications
-- Intensity and volume recommendations
-
-⚠️5. PERFORMANCE CONCERNS:
-- Any declining performance patterns
-- Potential overtraining in specific muscle groups
-- Imbalances between workout types
-- Recovery and programming issues
-
-Make it actionable and specific using their actual set-by-set data.
+If no significant stagnation, skip Plan B entirely. MUST cover all exercises.
 """
         
         return prompt 

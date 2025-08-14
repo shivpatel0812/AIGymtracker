@@ -1,6 +1,7 @@
 import { auth } from "./firebase";
+import { ENV } from "../config/environment";
 
-const API_BASE_URL = "http://localhost:8080/api/analysis";
+const API_BASE_URL = `${ENV.API_BASE_URL}/api/analysis`;
 
 export interface AnalysisRequest {
   userId: string;

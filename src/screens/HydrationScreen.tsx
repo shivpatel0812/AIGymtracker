@@ -12,7 +12,11 @@ import {
 } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { HydrationEntry } from "../types";
-import { saveHydrationEntry, getTodayHydration, getHydrationHistory } from "../services/hydration";
+import {
+  saveHydrationEntry,
+  getTodayHydration,
+  getHydrationHistory,
+} from "../services/hydration";
 import { colors } from "../config/theme";
 
 export const HydrationScreen: React.FC = () => {
@@ -26,10 +30,11 @@ export const HydrationScreen: React.FC = () => {
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const cupsToLiters = (cups: number) => cups * 0.236588;
-  const litersToCups = (liters: number) => Math.round(liters / 0.236588 * 100) / 100;
+  const litersToCups = (liters: number) =>
+    Math.round((liters / 0.236588) * 100) / 100;
 
   useEffect(() => {
     loadTodayEntry();
@@ -81,11 +86,11 @@ export const HydrationScreen: React.FC = () => {
 
       await saveHydrationEntry(hydrationEntry);
       Alert.alert("Success", "Hydration logged successfully!");
-      
+
       if (dateToSave === today) {
         setTodayEntry(hydrationEntry);
       }
-      
+
       setEditingEntry(null);
       setWaterIntake("");
       setHydrationQuality(5);
@@ -118,7 +123,9 @@ export const HydrationScreen: React.FC = () => {
   const qualityOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <Card style={styles.card}>
         <Card.Content>
           <Text variant="headlineSmall" style={styles.title}>
@@ -141,9 +148,9 @@ export const HydrationScreen: React.FC = () => {
               style={styles.textInput}
             />
             <Text variant="bodySmall" style={styles.conversionText}>
-              {waterIntake && !isNaN(parseFloat(waterIntake)) ? 
-                `≈ ${cupsToLiters(parseFloat(waterIntake)).toFixed(2)} liters` : 
-                "1 cup = 0.24 liters"}
+              {waterIntake && !isNaN(parseFloat(waterIntake))
+                ? `≈ ${cupsToLiters(parseFloat(waterIntake)).toFixed(2)} liters`
+                : "1 cup = 0.24 liters"}
             </Text>
           </View>
 
@@ -159,9 +166,15 @@ export const HydrationScreen: React.FC = () => {
                   onPress={() => setHydrationQuality(quality)}
                   style={[
                     styles.chip,
-                    hydrationQuality === quality && { backgroundColor: colors.neonCyan }
+                    hydrationQuality === quality && {
+                      backgroundColor: colors.neonCyan,
+                    },
                   ]}
-                  textStyle={hydrationQuality === quality && { color: theme.colors.surface }}
+                  textStyle={
+                    hydrationQuality === quality && {
+                      color: theme.colors.surface,
+                    }
+                  }
                 >
                   {quality}
                 </Chip>
@@ -190,7 +203,8 @@ export const HydrationScreen: React.FC = () => {
                 Today's Entry:
               </Text>
               <Text variant="bodyMedium">
-                Water: {litersToCups(todayEntry.water_intake)} cups | Quality: {todayEntry.hydration_quality}/10
+                Water: {litersToCups(todayEntry.water_intake)} cups | Quality:{" "}
+                {todayEntry.hydration_quality}/10
               </Text>
             </View>
           )}
@@ -204,7 +218,12 @@ export const HydrationScreen: React.FC = () => {
             buttonColor={colors.neonCyan}
             textColor={theme.colors.surface}
           >
-            {editingEntry ? "Update" : todayEntry && !editingEntry ? "Update Today" : "Save"} Hydration
+            {editingEntry
+              ? "Update"
+              : todayEntry && !editingEntry
+              ? "Update Today"
+              : "Save"}{" "}
+            Hydration
           </Button>
         </Card.Content>
       </Card>
@@ -255,6 +274,23 @@ const styles = StyleSheet.create({
   currentTitle: {
     fontWeight: "600",
     marginBottom: 4,
+  },
+  conversionText: {
+    opacity: 0.7,
+  },
+  editingBanner: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "rgba(94, 255, 255, 0.08)",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  editingTitle: {
+    color: colors.neonCyan,
+    fontWeight: "600",
   },
   saveButton: {
     marginTop: 8,

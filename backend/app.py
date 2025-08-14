@@ -225,9 +225,10 @@ if __name__ == '__main__':
     print("   - POST /workout/analyze")
     print("=" * 50)
     
-    # Run the Flask development server
+    # Run the Flask server
+    debug_mode = os.getenv('FLASK_ENV', 'production') == 'development'
     app.run(
         host='0.0.0.0',
         port=8000,
-        debug=True
+        debug=debug_mode
     )
