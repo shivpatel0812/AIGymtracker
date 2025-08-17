@@ -8,6 +8,7 @@ import {
   Portal,
   Modal,
   useTheme,
+  FAB,
 } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useWorkoutDraft } from "../store/useWorkoutDraft";
@@ -16,6 +17,8 @@ import { ExerciseEntry, DayType, Workout } from "../types";
 import { saveWorkout, updateWorkout } from "../services/workouts";
 import { getDayTypeState } from "../services/snapshots";
 import { colors } from "../config/theme";
+import { useAgent } from "../hooks/useAgent";
+import { AgentInterface } from "../components/AgentInterface";
 
 const EXERCISE_CATALOG = [
   { id: "press_bench_incline_db", name: "Incline DB Bench", category: "Push" },
@@ -35,6 +38,15 @@ export const LogWorkoutScreen: React.FC = () => {
   const [workoutNotes, setWorkoutNotes] = useState("");
   const [lastDayTypeSummary, setLastDayTypeSummary] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAgentVisible, setIsAgentVisible] = useState(false);
+  
+  const { 
+    isInitialized, 
+    requestWorkoutSuggestion,
+    celebrateAchievement,
+    handleEmergency,
+    updateContext 
+  } = useAgent({ currentScreen: 'LogWorkout' });
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -51,7 +63,16 @@ export const LogWorkoutScreen: React.FC = () => {
       setWorkoutNotes(workoutToEdit.notes || "");
     }
     loadLastDayTypeSummary();
-  }, []);
+    
+    updateContext({
+      currentScreen: 'LogWorkout',
+      sessionData: { 
+        currentWorkout, 
+        isEditMode, 
+        exerciseCount: currentWorkout?.exercises.length || 0 
+      }
+    });
+  }, [currentWorkout]);
 
   const loadLastDayTypeSummary = async () => {
     if (!currentWorkout?.dayType) return;
@@ -130,6 +151,16 @@ export const LogWorkoutScreen: React.FC = () => {
         const cleanWorkout = JSON.parse(JSON.stringify(workoutToPersist));
         await saveWorkout(cleanWorkout);
         clearDraft();
+        
+        // Celebrate workout completion
+        if (isInitialized) {
+          await celebrateAchievement({
+            type: 'personal_best',
+            value: `${workoutToPersist.exercises.length} exercises completed`,
+            context: { workoutType: workoutToPersist.dayType }
+          });
+        }
+        
         navigation.navigate("WorkoutComplete" as never);
       }
     } catch (error) {
@@ -225,6 +256,28 @@ export const LogWorkoutScreen: React.FC = () => {
             >
               Add Exercise
             </Button>
+            
+            <Button
+              mode="outlined"
+              onPress={async () => {
+                if (!isInitialized) return;
+                try {
+                  await requestWorkoutSuggestion({
+                    availableTime: 60,
+                    equipment: ['barbell', 'dumbbell'],
+                    goals: [currentWorkout?.dayType.toLowerCase() || 'general']
+                  });
+                  setIsAgentVisible(true);
+                } catch (error) {
+                  console.error('Error requesting workout suggestion:', error);
+                }
+              }}
+              style={styles.actionButton}
+              icon="lightbulb"
+              disabled={!isInitialized}
+            >
+              Get AI Help
+            </Button>
           </View>
         </View>
 
@@ -314,6 +367,26 @@ export const LogWorkoutScreen: React.FC = () => {
           </View>
         </Modal>
       </Portal>
+      
+      <FAB
+        icon="robot"
+        style={styles.fab}
+        onPress={() => setIsAgentVisible(true)}
+        disabled={!isInitialized}
+        size="small"
+      />
+      
+      <AgentInterface
+        visible={isAgentVisible}
+        onDismiss={() => setIsAgentVisible(false)}
+        currentScreen="LogWorkout"
+        contextData={{ 
+          currentWorkout, 
+          exerciseCount: currentWorkout?.exercises.length || 0,
+          dayType: currentWorkout?.dayType,
+          isEditMode 
+        }}
+      />
     </View>
   );
 };
@@ -392,5 +465,12 @@ const styles = StyleSheet.create({
   modalButton: {
     flex: 1,
     marginHorizontal: 8,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    top: 100,
+    backgroundColor: colors.neonCyan,
   },
 });

@@ -25,6 +25,7 @@ import { StressScreen } from "./src/screens/StressScreen";
 import { DailyDataScreen } from "./src/screens/DailyDataScreen";
 import { AnalysisResultScreen } from "./src/screens/AnalysisResultScreen";
 import { AnalysisHistoryScreen } from "./src/screens/AnalysisHistoryScreen";
+import { ComprehensiveProfileScreen } from "./src/screens/ComprehensiveProfileScreen";
 
 const Stack = createStackNavigator();
 const PERSISTENCE_KEY = "NAVIGATION_STATE_V1";
@@ -323,6 +324,14 @@ const AppNavigator: React.FC = () => {
                     size={24}
                   />
                 ),
+              }}
+            />
+            <Stack.Screen
+              name="ComprehensiveProfile"
+              component={ComprehensiveProfileScreen}
+              options={{
+                title: "Complete Profile",
+                headerShown: false,
               }}
             />
           </>

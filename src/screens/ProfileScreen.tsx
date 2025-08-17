@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import {
   Text,
@@ -7,15 +7,49 @@ import {
   Avatar,
   Divider,
   useTheme,
+  FAB,
 } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
+
+type ProfileNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
+import { useAgent } from "../hooks/useAgent";
+import { AgentInterface } from "../components/AgentInterface";
+import { getUserPreferences, saveUserPreferences } from "../services/agentMemory";
+import { colors } from "../config/theme";
 
 export const ProfileScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const theme = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<ProfileNavigationProp>();
+  const [isAgentVisible, setIsAgentVisible] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
+  
+  const { 
+    isInitialized, 
+    sendMessage,
+    updateContext 
+  } = useAgent({ currentScreen: 'Profile' });
 
+  useEffect(() => {
+    loadUserPreferences();
+    updateContext({
+      currentScreen: 'Profile',
+      sessionData: { user: user?.uid, preferences: userPreferences }
+    });
+  }, [user]);
+  
+  const loadUserPreferences = async () => {
+    try {
+      const preferences = await getUserPreferences();
+      setUserPreferences(preferences);
+    } catch (error) {
+      console.error('Error loading preferences:', error);
+    }
+  };
+  
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -23,13 +57,25 @@ export const ProfileScreen: React.FC = () => {
       console.error("Sign out error:", error);
     }
   };
+  
+  const handlePreferencesSetup = async () => {
+    if (!isInitialized) return;
+    
+    try {
+      await sendMessage("I'd like to set up my fitness preferences and goals");
+      setIsAgentVisible(true);
+    } catch (error) {
+      console.error('Error setting up preferences:', error);
+    }
+  };
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
-    >
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
       <View
         style={[styles.header, { borderBottomColor: theme.colors.outline }]}
       >
@@ -108,11 +154,31 @@ export const ProfileScreen: React.FC = () => {
 
           <Button
             mode="outlined"
-            onPress={() => {}}
+            onPress={handlePreferencesSetup}
             style={styles.settingButton}
-            icon="cog"
+            icon="account-cog"
+            disabled={!isInitialized}
           >
-            General Settings
+            AI Coach Preferences
+          </Button>
+          
+          <Button
+            mode="outlined"
+            onPress={() => setIsAgentVisible(true)}
+            style={styles.settingButton}
+            icon="target"
+            disabled={!isInitialized}
+          >
+            Set Fitness Goals
+          </Button>
+
+          <Button
+            mode="outlined"
+            onPress={() => navigation.navigate("ComprehensiveProfile")}
+            style={styles.settingButton}
+            icon="account-details"
+          >
+            Complete Profile Setup
           </Button>
 
           <Button
@@ -135,7 +201,7 @@ export const ProfileScreen: React.FC = () => {
 
           <Button
             mode="outlined"
-            onPress={() => navigation.navigate("FoodLog" as never)}
+            onPress={() => navigation.navigate("FoodLog")}
             style={styles.settingButton}
             icon="food"
           >
@@ -144,7 +210,7 @@ export const ProfileScreen: React.FC = () => {
 
           <Button
             mode="outlined"
-            onPress={() => navigation.navigate("Hydration" as never)}
+            onPress={() => navigation.navigate("Hydration")}
             style={styles.settingButton}
             icon="water"
           >
@@ -153,7 +219,7 @@ export const ProfileScreen: React.FC = () => {
 
           <Button
             mode="outlined"
-            onPress={() => navigation.navigate("Stress" as never)}
+            onPress={() => navigation.navigate("Stress")}
             style={styles.settingButton}
             icon="heart-pulse"
           >
@@ -162,6 +228,44 @@ export const ProfileScreen: React.FC = () => {
 
         </Card.Content>
       </Card>
+      
+      {userPreferences && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text variant="titleMedium" style={styles.cardTitle}>
+              AI Coach Status
+            </Text>
+            <Divider style={styles.divider} />
+            
+            <View style={styles.infoRow}>
+              <Text variant="bodyMedium" style={styles.label}>
+                Communication Style:
+              </Text>
+              <Text variant="bodySmall" style={styles.value}>
+                {userPreferences.communicationStyle || 'Not set'}
+              </Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text variant="bodyMedium" style={styles.label}>
+                Primary Goal:
+              </Text>
+              <Text variant="bodySmall" style={styles.value}>
+                {userPreferences.fitnessGoals?.primaryGoal || 'Not set'}
+              </Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text variant="bodyMedium" style={styles.label}>
+                Workout Reminders:
+              </Text>
+              <Text variant="bodySmall" style={styles.value}>
+                {userPreferences.notificationPreferences?.workoutReminders ? 'On' : 'Off'}
+              </Text>
+            </View>
+          </Card.Content>
+        </Card>
+      )}
 
       <View style={[styles.actions, { borderTopColor: theme.colors.outline }]}>
         <Button
@@ -173,7 +277,23 @@ export const ProfileScreen: React.FC = () => {
           Sign Out
         </Button>
       </View>
-    </ScrollView>
+      </ScrollView>
+      
+      <FAB
+        icon="robot"
+        label={isInitialized ? "AI Coach" : "Loading..."}
+        style={styles.fab}
+        onPress={() => setIsAgentVisible(true)}
+        disabled={!isInitialized}
+      />
+      
+      <AgentInterface
+        visible={isAgentVisible}
+        onDismiss={() => setIsAgentVisible(false)}
+        currentScreen="Profile"
+        contextData={{ userPreferences, user: user?.uid }}
+      />
+    </View>
   );
 };
 
@@ -234,5 +354,12 @@ const styles = StyleSheet.create({
   },
   signOutButton: {
     paddingVertical: 8,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.neonCyan,
   },
 });

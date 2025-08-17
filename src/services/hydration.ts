@@ -13,7 +13,9 @@ import {
 import { db, auth } from "./firebase";
 import { HydrationEntry } from "../types";
 
-export const saveHydrationEntry = async (hydrationEntry: HydrationEntry): Promise<string> => {
+export const saveHydrationEntry = async (
+  hydrationEntry: HydrationEntry
+): Promise<string> => {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("User not authenticated");
 
@@ -31,18 +33,20 @@ export const saveHydrationEntry = async (hydrationEntry: HydrationEntry): Promis
   }
 };
 
-export const getTodayHydration = async (date: string): Promise<HydrationEntry | null> => {
+export const getTodayHydration = async (
+  date: string
+): Promise<HydrationEntry | null> => {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("User not authenticated");
 
   try {
     const docRef = doc(db, `users/${uid}/hydration`, date);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
       return { id: docSnap.id, ...docSnap.data() } as HydrationEntry;
     }
-    
+
     return null;
   } catch (error) {
     console.error("Error getting hydration entry:", error);
@@ -50,7 +54,9 @@ export const getTodayHydration = async (date: string): Promise<HydrationEntry | 
   }
 };
 
-export const getHydrationHistory = async (limitCount: number = 30): Promise<HydrationEntry[]> => {
+export const getHydrationHistory = async (
+  limitCount: number = 30
+): Promise<HydrationEntry[]> => {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("User not authenticated");
 
@@ -62,9 +68,9 @@ export const getHydrationHistory = async (limitCount: number = 30): Promise<Hydr
     );
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as HydrationEntry[];
   } catch (error) {
     console.error("Error getting hydration history:", error);
