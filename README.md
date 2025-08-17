@@ -1,10 +1,10 @@
-# GymApp 🏋️‍♂️🤖
+# WellnessAI 🏋️‍♂️🤖
 
 **The world's first truly agentic AI fitness coach** - A comprehensive fitness tracking application with advanced AI agent capabilities, React Native frontend, Spring Boot API, Python AI backend, and Firebase integration.
 
 ## 📋 Summary
 
-GymApp is not just another fitness tracker - it's your **intelligent AI fitness companion** that actively monitors, learns, and adapts to help you achieve your goals. Unlike traditional reactive apps that just respond to queries, GymApp features a **fully agentic AI system** that proactively identifies opportunities, takes initiative, and continuously optimizes your fitness journey.
+WellnessAI is not just another fitness tracker - it's your **intelligent AI fitness companion** that actively monitors, learns, and adapts to help you achieve your goals. Unlike traditional reactive apps that just respond to queries, WellnessAI features a **fully agentic AI system** that proactively identifies opportunities, takes initiative, and continuously optimizes your fitness journey.
 
 ### 🧠 **Agentic AI Capabilities**
 
@@ -20,7 +20,7 @@ GymApp is not just another fitness tracker - it's your **intelligent AI fitness 
 
 **Planning & Reasoning**: Breaks down complex fitness goals into actionable steps, creates contingency plans, and reasons through cause-and-effect relationships in your data.
 
-### 🎯 **What Makes GymApp Different**
+### 🎯 **What Makes WellnessAI Different**
 
 Instead of just answering "how do I improve my bench press?", your AI coach:
 - **Remembers** you mentioned dips work exceptionally well for your triceps
@@ -31,9 +31,9 @@ Instead of just answering "how do I improve my bench press?", your AI coach:
 
 The AI transforms from a simple Q&A tool into an **intelligent fitness partner** that knows you personally and works continuously toward your success.
 
-## 🆚 **Traditional Fitness Apps vs GymApp**
+## 🆚 **Traditional Fitness Apps vs WellnessAI**
 
-| Feature | Traditional Apps | GymApp AI Agent |
+| Feature | Traditional Apps | WellnessAI Agent |
 |---------|------------------|-----------------|
 | **Interaction Style** | Reactive Q&A | Proactive coaching |
 | **Memory** | Session-based only | Persistent across all sessions |

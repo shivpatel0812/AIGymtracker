@@ -1,8 +1,8 @@
-# 🤖 GymApp AI Agent System
+# 🤖 WellnessAI Agent System
 
 ## Overview
 
-GymApp features a sophisticated **agentic AI system** that goes far beyond traditional chatbots or reactive AI assistants. This system implements six core capabilities that work together to create a truly intelligent fitness companion.
+WellnessAI features a sophisticated **agentic AI system** that goes far beyond traditional chatbots or reactive AI assistants. This system implements six core capabilities that work together to create a truly intelligent fitness companion.
 
 ## 🧠 Core Agentic Capabilities
 
@@ -253,4 +253,4 @@ The comprehensive profiling system captures detailed personal insights that enab
 3. Review type definitions in `/src/types/`
 4. Test individual capabilities before integration
 
-The AI agent system represents a new paradigm in fitness applications - moving from reactive tools to proactive, intelligent coaching partners that truly understand and adapt to each user's unique journey.
+The WellnessAI agent system represents a new paradigm in fitness applications - moving from reactive tools to proactive, intelligent coaching partners that truly understand and adapt to each user's unique journey.
