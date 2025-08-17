@@ -1,6 +1,6 @@
 # WellnessAI 🏋️‍♂️🤖
 
-**The world's first truly agentic AI fitness coach** - A comprehensive fitness tracking application with advanced AI agent capabilities, React Native frontend, Spring Boot API, Python AI backend, and Firebase integration.
+**A truly agentic AI fitness coach** - A comprehensive fitness tracking application with advanced AI agent capabilities, React Native frontend, Spring Boot API, Python AI backend, and Firebase integration.
 
 ## 📋 Summary
 
@@ -22,14 +22,15 @@ WellnessAI is not just another fitness tracker - it's your **intelligent AI fitn
 
 ### 🎯 **What Makes WellnessAI Different**
 
-Instead of just answering "how do I improve my bench press?", your AI coach:
+WellnessAI stands apart from traditional fitness apps through its agentic approach. Instead of just answering "how do I improve my bench press?", your AI coach:
+
 - **Remembers** you mentioned dips work exceptionally well for your triceps
 - **Analyzes** your plateau patterns and injury history  
 - **Proactively suggests** a periodization plan before you even ask
 - **Adapts** recommendations based on your unique response patterns
 - **Integrates** your schedule, stress levels, and preferences automatically
 
-The AI transforms from a simple Q&A tool into an **intelligent fitness partner** that knows you personally and works continuously toward your success.
+Unlike reactive fitness apps that simply respond to queries, WellnessAI features an **intelligent agent** that actively monitors your progress, learns your patterns, and continuously works toward your success - transforming from a simple Q&A tool into a **personalized fitness partner** that knows you intimately.
 
 ## 🆚 **Traditional Fitness Apps vs WellnessAI**
 
